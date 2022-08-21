@@ -1,4 +1,4 @@
-from asyncio import Task
+from asyncio import CancelledError, Task
 from typing import Optional
 
 from app.store import Store
@@ -11,12 +11,11 @@ class Poller:
         self.poll_task: Optional[Task] = None
 
     async def start(self):
-        # TODO: добавить asyncio Task на запуск poll
-        raise NotImplementedError
+        self.poll_task = Task(self.poll)
 
     async def stop(self):
-        # TODO: gracefully завершить Poller
-        raise NotImplementedError
+        self.poll_task.cancel()
 
     async def poll(self):
-        raise NotImplementedError
+        return self.poll_task
+
