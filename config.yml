@@ -5,6 +5,7 @@ session:
 admin:
   email: admin@admin.com
   password: admin
+
 bot:
   token: vk1.a.TBN2X0wjQMk_bzk8Nm5uKZ-EHEYv9gepEXOGURw1bmTAxIEAbhJ02a5zSvgHiseNFS_aTNEKkAcGEkaJsh1jDRo3eKTd91nY-j4DE2Bl-20SP1VH1tXGxfJOi_ZaroafovUowlpNQmJ2iRLG9bac4ZUKJVZovMl29GjxdKaDiF-Rv9kofAgjw7WnTBsbyufK
   group_id: 215478014
