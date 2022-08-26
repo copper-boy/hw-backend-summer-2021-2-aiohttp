@@ -1,6 +1,7 @@
 import base64
 from hashlib import sha256
 
+from aiohttp.web_exceptions import HTTPForbidden
 from aiohttp_apispec import request_schema, response_schema
 from aiohttp_session import new_session
 
@@ -15,25 +16,21 @@ class AdminLoginView(View):
     @response_schema(AdminResponseSchema)
     async def post(self):
         data = self.request['data']
-        admin = await self.request.app.store.admins.get_by_email(data['email'])
-        if not admin:
-            return error_json_response(http_status=403, message='invalid email or password', status='forbidden')
-        if sha256(data['password'].encode('utf-8')).hexdigest() != admin.password:
-            return error_json_response(http_status=403, message='invalid email or password', status='forbidden')
+        existed_admin = await self.request.app.store.admins.get_by_email(data['email'])
+        if not existed_admin:
+            raise HTTPForbidden
+        if sha256(data['password'].encode('utf-8')).hexdigest() != existed_admin.password:
+            raise HTTPForbidden
+
+        raw_admin = AdminResponseSchema().dump(existed_admin)
 
         session = await new_session(request=self.request)
-        session['email'] = admin.email
+        session['admin'] = raw_admin
 
-        return json_response(data=AdminResponseSchema().dump(admin))
+        return json_response(data=raw_admin)
 
 
-class AdminCurrentView(View, AuthRequiredMixin):
+class AdminCurrentView(AuthRequiredMixin, View):
     @response_schema(AdminResponseSchema)
     async def get(self):
-        result = await self.auth_required(self.request)
-        if not isinstance(result, str):
-            return result
-
-        admin = await self.request.app.store.admins.get_by_email(result)
-
-        return json_response(data=AdminResponseSchema().dump(admin))
+        return json_response(data=AdminResponseSchema().dump(self.request.admin))

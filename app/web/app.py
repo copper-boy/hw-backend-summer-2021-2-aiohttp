@@ -6,6 +6,8 @@ from aiohttp.web import (
     Request as AiohttpRequest,
 )
 from aiohttp_apispec import setup_aiohttp_apispec
+from aiohttp_session import setup as setup_aiohttp_session
+from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from app.admin.models import Admin
 from app.store import setup_store, Store
@@ -52,6 +54,7 @@ def setup_app(config_path: str) -> Application:
     setup_aiohttp_apispec(app)
     setup_logging(app)
     setup_routes(app)
+    setup_aiohttp_session(app, EncryptedCookieStorage(app.config.session.key))
     setup_middlewares(app)
     setup_store(app)
     return app

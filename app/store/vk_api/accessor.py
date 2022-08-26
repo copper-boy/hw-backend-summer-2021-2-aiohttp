@@ -13,7 +13,7 @@ if typing.TYPE_CHECKING:
 
 
 class VkApiAccessor(BaseAccessor):
-    def __init__(self, app: 'Application', *args, **kwargs):
+    def __init__(self, app: 'Application', *args, **kwargs) -> None:
         super().__init__(app, *args, **kwargs)
         self.session: Optional[ClientSession] = None
         self.poller: Optional[Poller] = None
@@ -21,19 +21,19 @@ class VkApiAccessor(BaseAccessor):
         self.server: Optional[str] = None
         self.ts: Optional[int] = None
 
-    async def connect(self, app: 'Application'):
+    async def connect(self, app: 'Application') -> None:
         self.session = ClientSession()
         await self._get_long_poll_service()
         poll = Poller(store=app.store)
         await poll.start()
 
-    async def disconnect(self, app: 'Application'):
+    async def disconnect(self, app: 'Application') -> None:
         if self.session is not None:
             await self.session.close()
         if self.poller is not None:
             await self.poller.stop()
 
-    async def _get_long_poll_service(self):
+    async def _get_long_poll_service(self) -> None:
         async with self.session.get(
                 'https://api.vk.com/method/groups.getLongPollServer?'
                 'group_id={group_id}&'
@@ -49,7 +49,7 @@ class VkApiAccessor(BaseAccessor):
             self.server = resp_json['server']
             self.ts = resp_json['ts']
 
-    async def poll(self):
+    async def poll(self) -> None:
         async with self.session.get(
                 '{server}?'
                 'act=a_check&'
